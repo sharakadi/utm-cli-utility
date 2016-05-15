@@ -13,19 +13,6 @@ namespace UtmCliUtility.Commands
     ]
     public class GetSchemas : CommandProcessor
     {
-        //public GetSchemas(TransportWrapper transport, string[] argments, string workingDirectory, Action<string> infoWriter)
-        //{
-        //    TransportWrapper = transport;
-        //    Arguments = argments;
-        //    WorkingDirectory = new DirectoryInfo(workingDirectory);
-        //    InfoWriter = infoWriter;
-        //}
-
-        public GetSchemas()
-        {
-            
-        }
-
         private string GetHomePageContent()
         {
             return TransportWrapper.GetPageContent(TransportWrapper.Address);

@@ -5,7 +5,6 @@ namespace UtmCliUtility
 {
     public interface ICommandProcessor
     {
-        string Name { get; }
         string[] Arguments { get; set; }
         DirectoryInfo WorkingDirectory { get; set; }
         TransportWrapper TransportWrapper { get; set; }
