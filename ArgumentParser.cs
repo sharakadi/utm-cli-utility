@@ -13,15 +13,14 @@ namespace UtmCliUtility
             _arguments = arguments;
         }
 
-        public bool ParameterExists(string name)
+        public bool ParameterExists(params string[] parameterNameAliases)
         {
-            return _arguments.Any(x => x == "-" + name);
+            return parameterNameAliases.Any(x => _arguments.Contains("-" + x));
         }
 
         public IEnumerable<string> GetValues(params string[] parameterNameAliases)
         {
-            if (!parameterNameAliases.Select(ParameterExists).Any()) throw new Exception();
-            //var idx = _arguments.FirstIndexOf(x => x == "-" + parameterName);
+            if (!ParameterExists(parameterNameAliases)) throw new Exception();
             var idx = int.MinValue;
             foreach (var p in parameterNameAliases)
             {
