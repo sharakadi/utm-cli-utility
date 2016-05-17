@@ -48,6 +48,7 @@
     <Compile Include="CommandProcessorFactory.cs" />
     <Compile Include="CommandProcessorInfoAttribute.cs" />
     <Compile Include="Commands\GenerateCSharpClass.cs" />
+    <Compile Include="Commands\SendAct.cs" />
     <Compile Include="EnumerableHelper.cs" />
     <Compile Include="Commands\GetSchemas.cs" />
     <Compile Include="ICommandProcessor.cs" />
