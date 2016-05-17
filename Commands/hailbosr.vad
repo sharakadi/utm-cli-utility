@@ -1,0 +1,49 @@
+﻿using System;
+using System.Collections;
+using System.IO;
+using System.Linq;
+
+namespace UtmCliUtility.Commands
+{
+    [CommandProcessorInfo(
+        Name = "generate-csharp-class", 
+        Description = "Генерирует класс на языке C# из файлов XSD",
+        Usage="\t-xsd <ПутьКXsd.exe> - путь к утилите xsd.exe")]
+    public class GenerateCSharpClass : CommandProcessor
+    {
+        public override string Name
+        {
+            get { return "generate-csharp-class"; }
+        }
+
+        protected override string ProcessInternal()
+        {
+            var xsdToolPath = Parser.GetValues("-xsd").FirstOrDefault();
+            if (xsdToolPath == null)
+            {
+                xsdToolPath = SearchForXsdToolAndGetPath();
+                if (xsdToolPath == null) throw new Exception("Утилита xsd.exe не найдена в системе.");
+            }
+            throw new NotImplementedException();
+        }
+
+        private string SearchForXsdToolAndGetPath()
+        {
+            var locations = new string[]
+            {"%programfiles%\\Microsoft SDKs\\Windows", "%programfiles(x86)%\\Microsoft SDKs\\Windows"};
+
+            foreach (var loc in locations.Select(Environment.ExpandEnvironmentVariables))
+            {
+                if (!Directory.Exists(loc)) continue;
+                var dirs = Directory.GetDirectories(loc).ToDictionary(k => k.Split('\\').Last(), v => v);
+                foreach (var path in new SortedList(dirs).GetValueList().Cast<string>().Reverse())
+                {
+                    var xsdTool = SearchInDirectory(path, "xsd.exe", false);
+                    if (xsdTool != null) return xsdTool;
+                }
+            }
+
+            return null;
+        }
+    }
+}

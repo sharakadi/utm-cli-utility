@@ -22,7 +22,7 @@ namespace UtmCliUtility.Commands
 
         protected override string ProcessInternal()
         {
-            var xsdToolPath = Parser.GetValues("-xsd").FirstOrDefault();
+            var xsdToolPath = Parser.ParameterExists("-xsd") ? Parser.GetValues("-xsd").First() : null;
             if (xsdToolPath == null)
             {
                 xsdToolPath = SearchForXsdToolAndGetPath();
@@ -49,9 +49,72 @@ namespace UtmCliUtility.Commands
                         files.AddRange(File.ReadAllLines(file));
                     }
                 }
-            }
+                if (Parser.ParameterExists("d", "dir"))
+                {
+                    foreach (var dir in Parser.GetValues("d", "dir"))
+                    {
+                        var dirFiles = Directory.GetFiles(dir, "*.xsd");
+                        files.AddRange(dirFiles);
+                    }
+                }
+                if (Parser.ParameterExists("x", "exclude"))
+                {
+                    foreach (
+                        var delete in
+                            Parser.GetValues("x", "exclude")
+                                .Select(x => files.Select(Path.GetFileName).ToList().IndexOf(x))
+                                .Where(x => x > -1))
+                    {
+                        files.RemoveAt(delete);
+                    }
+                }
 
-            throw new Exception();
+                ValidateFiles(files);
+                char newNameCursor = '!';
+                List<string> newFiles = new List<string>(files.Count);
+                foreach (var file in files)
+                {
+                    while (Path.GetInvalidFileNameChars().Contains(newNameCursor)) newNameCursor++;
+                    var newFile = Path.Combine(tempDir.FullName, newNameCursor + ".xsd");
+                    File.Copy(file, newFile);
+                    newFiles.Add(newFile);
+                    newNameCursor++;
+                }
+
+                RunXsdTool(xsdToolPath, files.ToArray());
+
+                throw new Exception();
+            }
+            return null;
+        }
+
+        private void RunXsdTool(string toolExePath, string[] filesFullNames)
+        {
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.UseShellExecute = false;
+            startInfo.FileName = toolExePath;
+            startInfo.Arguments = "/c " + string.Join(" ", filesFullNames.Select(x => "\"" + x + "\""));
+            process.StartInfo = startInfo;
+            process.Start();
+            process.WaitForExit();
+            Console.WriteLine();
+            Console.WriteLine("Вывод xsd.exe:");
+            Console.WriteLine(process.StandardOutput.ReadToEnd());
+        }
+
+        private void ValidateFiles(IEnumerable<string> files)
+        {
+            foreach (var file in files)
+            {
+                if (!File.Exists(file))
+                {
+                    InfoWriteLineFormat("Файл не найден: ", file);
+                    throw new Exception("Файл не найден: " + file);
+                }
+            }
         }
 
         private string SearchForXsdToolAndGetPath()

@@ -21,7 +21,7 @@ namespace UtmCliUtility
 
             public void Dispose()
             {
-                if (Directory.Exists(FullName)) Directory.Delete(FullName);
+                if (Directory.Exists(FullName)) Directory.Delete(FullName, true);
             }
         }
 
@@ -97,6 +97,15 @@ namespace UtmCliUtility
                 if (result != null) return result;
             }
             return null;
+        }
+
+        protected string GetFullPath(string relativePath)
+        {
+            if (relativePath.StartsWith(".") || relativePath.StartsWith("\\"))
+            {
+                return Path.GetFullPath(relativePath);
+            }
+            return relativePath;
         }
 
         protected abstract string ProcessInternal();

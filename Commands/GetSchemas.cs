@@ -30,9 +30,9 @@ namespace UtmCliUtility.Commands
                 schemas.Select(
                     x => new
                     {
-                        Directory = outputDir ?? WorkingDirectory.FullName,
+                        Directory = GetFullPath(outputDir) ?? WorkingDirectory.FullName,
                         Filename = x.PathAndQuery.Split('/').Last(),
-                        Content = TransportWrapper.GetPageContent(x)
+                        Content = TransportWrapper.ParseXsdFromWebPage(TransportWrapper.GetPageContent(x))
                     }).ToArray();
 
             InfoWriteLineFormat("OK");

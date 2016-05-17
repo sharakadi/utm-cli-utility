@@ -25,6 +25,7 @@ namespace UtmCliUtility
                 Console.WriteLine("Произошла неустранимая ошибка при обработке команды {0}: {1}", commandName, result.Error);
                 Console.Error.WriteLine("ERROR:" + result.Error);
                 Console.Error.WriteLine("STACK TRACE:" + result.StackTrace);
+                Console.ReadKey();
                 return;
             }
             var output = parameters.GetValues("output", "o").ToArray();
