@@ -11,7 +11,8 @@ namespace UtmCliUtility.Commands
         Description = "Генерирует класс на языке C# из файлов XSD",
         Usage="\t\t-xsd <ПутьКXsd.exe> - путь к утилите xsd.exe\r\n" +
         "\t\t-l (-list) [<Файл1.xsd>,<Файл2.xsd>,...] - перечень XSD файлов\r\n" +
-        "\t\t-f (-file) <ФайлСоСписком> - файл со списком файлов XSD")]
+        "\t\t-f (-file) <ФайлСоСписком> - файл со списком файлов XSD")
+    ]
     public class GenerateCSharpClass : CommandProcessor
     {
         public override string Name

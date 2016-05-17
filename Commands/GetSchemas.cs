@@ -7,7 +7,8 @@ using System.Text;
 
 namespace UtmCliUtility.Commands
 {
-    [CommandProcessorInfo(Name = "get-schemas",
+    [CommandProcessorInfo(
+        Name = "get-schemas",
         Description = "Получение XSD из УТМ",
         Usage = "\t\t-dir <Директория> - указывает директорию для сохранения схем")
     ]
