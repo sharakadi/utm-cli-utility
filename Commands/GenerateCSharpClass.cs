@@ -91,7 +91,7 @@ namespace UtmCliUtility.Commands
                 InfoWriteLineFormat(">>>XSD.EXE>>>");
                 InfoWriteLineFormat(xsdOut);
                 InfoWriteLineFormat("<<<XSD.EXE<<<");
-                var outputFileRegex = new Regex(@"'([\w\\\-_:]{1,}?([\w._!$&]{1,}.cs))'");
+                var outputFileRegex = new Regex(@"'([\w\\\-_:]{1,}?([\w.!#$%&(),\.,'-;@\[\]+=]{1,}.cs))'");
                 if (!outputFileRegex.IsMatch(xsdOut)) throw  new Exception();
                 var outputCsFile = outputFileRegex.Match(xsdOut).Groups[1].Captures[0].Value;
                 Console.WriteLine("Файл CS успешно сформирован и направлен в вывод.");
