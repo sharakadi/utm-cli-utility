@@ -59,6 +59,11 @@ namespace UtmCliUtility
             if (InfoWriter != null) InfoWriter(string.Format(format, args));
         }
 
+        protected void InfoWriteLineFormat()
+        {
+            if (InfoWriter != null) InfoWriter(Environment.NewLine);
+        }
+
         public Action<string> InfoWriter { get; set; }
 
         public ProcessingResult Process()
