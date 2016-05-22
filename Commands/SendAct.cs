@@ -18,7 +18,7 @@ namespace UtmCliUtility.Commands
 
         protected override string ProcessInternal()
         {
-            return null;
+            throw  new NotImplementedException();
         }
     }
 }

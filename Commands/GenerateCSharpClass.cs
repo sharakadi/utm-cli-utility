@@ -3,16 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace UtmCliUtility.Commands
 {
     [CommandProcessorInfo(
         Name = "generate-csharp-class", 
         Description = "Генерирует класс на языке C# из файлов XSD",
-        Usage="\t\t-xsd <ПутьКXsd.exe> - путь к утилите xsd.exe\r\n" +
-        "\t\t-l (-list) [<Файл1.xsd>,<Файл2.xsd>,...] - перечень XSD файлов\r\n" +
-        "\t\t-f (-file) [<ФайлСоСписком1>,...] - файл со списком файлов XSD")
-    ]
+        Usage="\t   -xsd <ПутьКXsd.exe> - путь к утилите xsd.exe\r\n" +
+        "\t   -f (-files) [<Файл1.xsd>,<Файл2.xsd>,...] - перечень XSD файлов\r\n" +
+        "\t   -l (-lists) [<Файл1>,<Файл2>...] - файлы со списком файлов XSD\r\n" +
+        "\t   -d (-dir) [<Папка1>,<Папка2>,...] - перечень папок с файлами XSD\r\n" +
+        "\t   -x (-exclude) [<Файл1>,<Файл2>] - перечень исключаемых файлов\r\n" +
+        "\t   На выходе - содержимое CS файла (следует указать назначение вывода)")]
     public class GenerateCSharpClass : CommandProcessor
     {
         public override string Name
@@ -37,13 +40,14 @@ namespace UtmCliUtility.Commands
             using (var tempDir = CreateTemporaryDirectory())
             {
                 List<string> files = new List<string>();
-                if (Parser.ParameterExists("l", "list"))
+                InfoWriteLineFormat("Получение списка файлов...");
+                if (Parser.ParameterExists("f", "files"))
                 {
-                    files.AddRange(Parser.GetValues("l", "list"));
+                    files.AddRange(Parser.GetValues("f", "files"));
                 }
-                if (Parser.ParameterExists("f", "file"))
+                if (Parser.ParameterExists("l", "lists"))
                 {
-                    foreach (var file in Parser.GetValues("f", "file"))
+                    foreach (var file in Parser.GetValues("l", "lists"))
                     {
                         if (!File.Exists(file)) continue;
                         files.AddRange(File.ReadAllLines(file));
@@ -65,11 +69,13 @@ namespace UtmCliUtility.Commands
                                 .Select(x => files.Select(Path.GetFileName).ToList().IndexOf(x))
                                 .Where(x => x > -1))
                     {
+                        InfoWriteLineFormat("Исключен файл: {0}", files[delete]);
                         files.RemoveAt(delete);
                     }
                 }
 
                 ValidateFiles(files);
+                InfoWriteLineFormat("Всего файлов найдено: {0}", files.Count);
                 char newNameCursor = '!';
                 List<string> newFiles = new List<string>(files.Count);
                 foreach (var file in files)
@@ -81,14 +87,20 @@ namespace UtmCliUtility.Commands
                     newNameCursor++;
                 }
 
-                RunXsdTool(xsdToolPath, files.ToArray());
-
-                throw new Exception();
+                var xsdOut = RunXsdTool(xsdToolPath, tempDir.FullName, newFiles.ToArray());
+                InfoWriteLineFormat(">>>XSD.EXE>>>");
+                InfoWriteLineFormat(xsdOut);
+                InfoWriteLineFormat("<<<XSD.EXE<<<");
+                var outputFileRegex = new Regex(@"'([\w\\\-_:]{1,}?([\w.!#$%&(),\.,'-;@\[\]+=]{1,}.cs))'");
+                if (!outputFileRegex.IsMatch(xsdOut)) throw  new Exception();
+                var outputCsFile = outputFileRegex.Match(xsdOut).Groups[1].Captures[0].Value;
+                Console.WriteLine("Файл CS успешно сформирован и направлен в вывод.");
+                return File.ReadAllText(outputCsFile);
+                //throw new Exception();
             }
-            return null;
         }
 
-        private void RunXsdTool(string toolExePath, string[] filesFullNames)
+        private string RunXsdTool(string toolExePath, string outputDir, string[] filesFullNames)
         {
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
@@ -96,13 +108,11 @@ namespace UtmCliUtility.Commands
             startInfo.RedirectStandardOutput = true;
             startInfo.UseShellExecute = false;
             startInfo.FileName = toolExePath;
-            startInfo.Arguments = "/c " + string.Join(" ", filesFullNames.Select(x => "\"" + x + "\""));
+            startInfo.Arguments = "/c /o:\"" + outputDir + "\" " + string.Join(" ", filesFullNames.Select(x => "\"" + x + "\""));
             process.StartInfo = startInfo;
             process.Start();
             process.WaitForExit();
-            Console.WriteLine();
-            Console.WriteLine("Вывод xsd.exe:");
-            Console.WriteLine(process.StandardOutput.ReadToEnd());
+            return process.StandardOutput.ReadToEnd();
         }
 
         private void ValidateFiles(IEnumerable<string> files)
