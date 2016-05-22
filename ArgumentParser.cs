@@ -7,11 +7,15 @@ namespace UtmCliUtility
     public sealed class ArgumentParser
     {
         private readonly string[] _arguments;
+        public char ParameterPrefixChar { get; private set; }
 
-        public ArgumentParser(string[] arguments)
+        public ArgumentParser(string[] arguments, char parameterPreficChar)
         {
             _arguments = arguments;
+            ParameterPrefixChar = parameterPreficChar;
         }
+
+        public ArgumentParser(string[] arguments) : this(arguments, '-') { }
 
         public bool ParameterExists(params string[] parameterNameAliases)
         {

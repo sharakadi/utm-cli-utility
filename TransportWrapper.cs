@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using UtmCliUtility.XML;
 
 namespace UtmCliUtility
 {
@@ -11,13 +12,16 @@ namespace UtmCliUtility
     {
         public Uri Address { get; private set; }
 
-        private Lazy<string> _version;
+        private Lazy<string> _version, _fsrarId;
+
         public string Version
         {
-            get
-            {
-                return _version.Value;
-            }
+            get { return _version.Value; }
+        }
+
+        public string FsrarId
+        {
+            get { return _fsrarId.Value; }
         }
 
         public string GetPageContent(Uri uri, Encoding encoding = null)
@@ -64,10 +68,36 @@ namespace UtmCliUtility
             return capture.Value;
         }
 
+        private string GetFsrarId()
+        {
+            var fsrarIdRegex = new Regex(@"(FSRAR-RSA-(?'fsrarid'[0-9]{1,15}))");
+            var match = fsrarIdRegex.Match(GetPageContent(Address));
+            if (match.Groups.Count == 0) return null;
+            var capture = match.Groups["fsrarid"].Captures.Cast<Capture>().First();
+            if (capture == null) return null;
+            return capture.Value;
+        }
+
         public TransportWrapper(string url)
         {
             Address = new Uri(url);
-            _version = new Lazy<string>(() => GetTransportVersion());
+            _version = new Lazy<string>(GetTransportVersion);
+            _fsrarId = new Lazy<string>(GetFsrarId);
+        }
+
+        public A Post(Documents documents)
+        {
+            throw new NotImplementedException();
+        }
+
+        public HttpStatusCode Delete(Uri resource)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Documents Get(Uri resource)
+        {
+            throw new NotImplementedException();
         }
     }
 }

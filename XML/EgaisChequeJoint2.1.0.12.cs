@@ -14,7 +14,7 @@ using System.Xml.Serialization;
 // Этот исходный код был создан с помощью xsd, версия=4.0.30319.33440.
 // 
 
-namespace AlcoSpotEgais.Common.XML.V1012
+namespace UtmCliUtility.XML
 {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
