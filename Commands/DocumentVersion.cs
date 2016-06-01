@@ -39,6 +39,7 @@ namespace UtmCliUtility.Commands
         private string ChangeDocVersion(string version)
         {
             InfoWriteLineFormat("Переход на версию документооборота: {0}", version);
+            throw new NotImplementedException(); // TODO: !!! нужны версии схем 1.0.13
         }
     }
 }
