@@ -17,11 +17,11 @@ namespace UtmCliUtility
             public Type Type { get; set; }
         }
 
-        static readonly IDictionary<string, CommandProcessorInfoItem> _commands;
+        static readonly IDictionary<string, CommandProcessorInfoItem> Commands;
 
         static CommandProcessorFactory()
         {
-            _commands =
+            Commands =
                 AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(x => x.GetTypes())
                     .Where(x => x.GetCustomAttributes(typeof (CommandProcessorInfoAttribute), false).Any())
@@ -47,8 +47,8 @@ namespace UtmCliUtility
         public static ICommandProcessor Create(string commandName, TransportWrapper transport, Action<string> infoWriter, string[] arguments)
         {
             var wd = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (!_commands.ContainsKey(commandName)) throw new Exception("Неизвестная команда: " + commandName);
-            var inst = (ICommandProcessor) Activator.CreateInstance(_commands[commandName].Type);
+            if (!Commands.ContainsKey(commandName)) throw new Exception("Неизвестная команда: " + commandName);
+            var inst = (ICommandProcessor) Activator.CreateInstance(Commands[commandName].Type);
             inst.Arguments = arguments;
             inst.InfoWriter = infoWriter;
             inst.TransportWrapper = transport;
@@ -59,7 +59,7 @@ namespace UtmCliUtility
         public static CommandListItem[] GetCommands()
         {
             return
-                _commands.Select(
+                Commands.Select(
                     x => new CommandListItem {Description = x.Value.Description, Name = x.Key, Usage = x.Value.Usage})
                     .ToArray();
         }
