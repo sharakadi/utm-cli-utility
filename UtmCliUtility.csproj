@@ -47,6 +47,9 @@
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="CommandProcessorFactory.cs" />
     <Compile Include="CommandProcessorInfoAttribute.cs" />
+    <Compile Include="Commands\DocumentVersion.cs" />
+    <Compile Include="DocumentsHelper.cs" />
+    <Compile Include="DocumentsV1012.cs" />
     <Compile Include="Commands\GenerateCSharpClass.cs" />
     <Compile Include="Commands\SendAct.cs" />
     <Compile Include="EnumerableHelper.cs" />
