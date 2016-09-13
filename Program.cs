@@ -81,7 +81,7 @@ namespace UtmCliUtility
             Console.WriteLine("********************************************************");
             Console.WriteLine("* UtmCliUtility - утилита для извлечения данных из УТМ *");
             Console.WriteLine("********************************************************");
-            Console.WriteLine("Copyright (c) 2016 messerspiel (messerspiel@hmamail.com)");
+            Console.WriteLine("Copyright (c) 2016 Sharkadi Andrey (sharkadi.a@gmail.com)");
             Console.WriteLine();
         }
 

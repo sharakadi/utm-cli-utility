@@ -8,11 +8,13 @@ namespace UtmCliUtility
     {
         protected class TemporaryDirectory : IDisposable
         {
+            private static readonly Random Randomizer = new Random();
+
             public string FullName { get; private set; }
 
             internal TemporaryDirectory(string workingDirectory)
             {
-                var temp = System.IO.Path.Combine(workingDirectory, "temp_" + DateTime.Now.Ticks);
+                var temp = Path.Combine(workingDirectory, "tmp_" + DateTime.Now.Ticks.ToString().Substring(8) + Randomizer.Next(int.MaxValue));
                 var path = new DirectoryInfo(temp);
                 if (path.Exists) path.Delete();
                 path.Create();

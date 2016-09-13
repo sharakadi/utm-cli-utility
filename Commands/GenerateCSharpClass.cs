@@ -18,6 +18,42 @@ namespace UtmCliUtility.Commands
         "\t   На выходе - содержимое CS файла (следует указать назначение вывода)")]
     public class GenerateCSharpClass : CommandProcessor
     {
+        private class SequentialStringGenerator
+        {
+            private readonly Dictionary<int, char> _chars = new Dictionary<int, char>(2);
+            private int _index = 0;
+            private const char StartChar = '!';
+            private const char EndChar = 'Z';
+
+            public SequentialStringGenerator()
+            {
+                _chars.Add(_index, StartChar);
+            }
+
+            private void NextChar()
+            {
+                char current = _chars[_index];
+                if (++current > EndChar)
+                {
+                    _index++;
+                    _chars.Add(_index, StartChar);
+                }
+                else
+                    _chars[_index] = ++_chars[_index];
+            }
+
+            public string Next()
+            {
+                while (Path.GetInvalidFileNameChars().Contains(_chars[_index]))
+                {
+                    NextChar();
+                }
+                string result = string.Join("", _chars.Values);
+                NextChar();
+                return string.Join("", result);
+            }
+        }
+
         public override string Name
         {
             get { return "generate-csharp-class"; }
@@ -76,15 +112,13 @@ namespace UtmCliUtility.Commands
 
                 ValidateFiles(files);
                 InfoWriteLineFormat("Всего файлов найдено: {0}", files.Count);
-                char newNameCursor = '!';
+                var nameGenerator = new SequentialStringGenerator();
                 List<string> newFiles = new List<string>(files.Count);
                 foreach (var file in files)
                 {
-                    while (Path.GetInvalidFileNameChars().Contains(newNameCursor)) newNameCursor++;
-                    var newFile = Path.Combine(tempDir.FullName, newNameCursor + ".xsd");
+                    var newFile = Path.Combine(tempDir.FullName, nameGenerator.Next() + ".xsd");
                     File.Copy(file, newFile);
                     newFiles.Add(newFile);
-                    newNameCursor++;
                 }
 
                 var xsdOut = RunXsdTool(xsdToolPath, tempDir.FullName, newFiles.ToArray());
